@@ -24,10 +24,10 @@ public class RequestLogger<TTraceId> : IRequestLogger<TTraceId>
             {
                 TraceId = traceId,
                 ClientIp = await GetClientIp(context),
-                Path = await GetEndpoint(context),
+                EndPoint = await GetEndpoint(context),
                 RequestAt = DateTime.UtcNow, // Consider using UTC time
                 RequestBody = await GetRequestBody(context),
-                Method = context.Request.Method,
+                RequestMethod = context.Request.Method,
                 StatusCode = -1,
                 IsCancelled = false
             };
@@ -45,8 +45,8 @@ public class RequestLogger<TTraceId> : IRequestLogger<TTraceId>
                 TraceId = traceId,
                 RequestAt = DateTime.Now,
                 StatusCode = -1,
-                Method = context.Request.Method,
-                Path = context.Request.Path.ToString(),
+                RequestMethod = context.Request.Method,
+                EndPoint = context.Request.Path.ToString(),
                 ClientIp = "Unknown",
                 RequestBody = "Failed to capture request body due to an error",
                 IsCancelled = false

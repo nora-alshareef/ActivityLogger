@@ -1,0 +1,12 @@
+/Users/noraalshareef/RiderProjects/idart.shared/ActivityTracker/bin/Release/net8.0/ActivityTracker.deps.json
+/Users/noraalshareef/RiderProjects/idart.shared/ActivityTracker/bin/Release/net8.0/ActivityTracker.dll
+/Users/noraalshareef/RiderProjects/idart.shared/ActivityTracker/bin/Release/net8.0/ActivityTracker.pdb
+/Users/noraalshareef/RiderProjects/idart.shared/ActivityTracker/obj/Release/net8.0/ActivityTracker.csproj.AssemblyReference.cache
+/Users/noraalshareef/RiderProjects/idart.shared/ActivityTracker/obj/Release/net8.0/ActivityTracker.GeneratedMSBuildEditorConfig.editorconfig
+/Users/noraalshareef/RiderProjects/idart.shared/ActivityTracker/obj/Release/net8.0/ActivityTracker.AssemblyInfoInputs.cache
+/Users/noraalshareef/RiderProjects/idart.shared/ActivityTracker/obj/Release/net8.0/ActivityTracker.AssemblyInfo.cs
+/Users/noraalshareef/RiderProjects/idart.shared/ActivityTracker/obj/Release/net8.0/ActivityTracker.csproj.CoreCompileInputs.cache
+/Users/noraalshareef/RiderProjects/idart.shared/ActivityTracker/obj/Release/net8.0/ActivityTracker.dll
+/Users/noraalshareef/RiderProjects/idart.shared/ActivityTracker/obj/Release/net8.0/refint/ActivityTracker.dll
+/Users/noraalshareef/RiderProjects/idart.shared/ActivityTracker/obj/Release/net8.0/ActivityTracker.pdb
+/Users/noraalshareef/RiderProjects/idart.shared/ActivityTracker/obj/Release/net8.0/ref/ActivityTracker.dll

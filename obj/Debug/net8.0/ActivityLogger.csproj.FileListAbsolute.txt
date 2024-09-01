@@ -1,0 +1,15 @@
+/Users/noraalshareef/code/ActivityLogger/bin/Debug/net8.0/ActivityLogger.deps.json
+/Users/noraalshareef/code/ActivityLogger/bin/Debug/net8.0/ActivityLogger.dll
+/Users/noraalshareef/code/ActivityLogger/bin/Debug/net8.0/ActivityLogger.pdb
+/Users/noraalshareef/code/ActivityLogger/obj/Debug/net8.0/ActivityLogger.csproj.AssemblyReference.cache
+/Users/noraalshareef/code/ActivityLogger/obj/Debug/net8.0/ActivityLogger.GeneratedMSBuildEditorConfig.editorconfig
+/Users/noraalshareef/code/ActivityLogger/obj/Debug/net8.0/ActivityLogger.AssemblyInfoInputs.cache
+/Users/noraalshareef/code/ActivityLogger/obj/Debug/net8.0/ActivityLogger.AssemblyInfo.cs
+/Users/noraalshareef/code/ActivityLogger/obj/Debug/net8.0/ActivityLogger.csproj.CoreCompileInputs.cache
+/Users/noraalshareef/code/ActivityLogger/obj/Debug/net8.0/ActivityLogger.sourcelink.json
+/Users/noraalshareef/code/ActivityLogger/obj/Debug/net8.0/ActivityLogger.dll
+/Users/noraalshareef/code/ActivityLogger/obj/Debug/net8.0/refint/ActivityLogger.dll
+/Users/noraalshareef/code/ActivityLogger/obj/Debug/net8.0/ActivityLogger.pdb
+/Users/noraalshareef/code/ActivityLogger/obj/Debug/net8.0/ref/ActivityLogger.dll
+/Users/noraalshareef/code/ActivityLogger/bin/Debug/net8.0/Microsoft.IO.RecyclableMemoryStream.dll
+/Users/noraalshareef/code/ActivityLogger/obj/Debug/net8.0/ActivityLogger.csproj.CopyComplete

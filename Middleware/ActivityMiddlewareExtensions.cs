@@ -4,7 +4,6 @@ using ActivityLogger.Data;
 using ActivityLogger.Logging;
 using ActivityLogger.Models;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -15,15 +14,10 @@ public static class ActivityMiddlewareExtensions
 {
     public static IServiceCollection AddActivityServices<TTraceId>(
         this IServiceCollection services,
-        IConfiguration configuration,
         Func<IServiceProvider, DbConnection> dbConnectionFactory,
         Action<ActivityOptions>? configureOptions = null)
     {
-        services.AddOptions<ActivityOptions>()
-            .Bind(configuration.GetSection("Activity"))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
+        
         if (configureOptions != null)
             services.ConfigureOptions(
                 new ConfigureNamedOptions<ActivityOptions>(Options.DefaultName, configureOptions));
@@ -32,16 +26,23 @@ public static class ActivityMiddlewareExtensions
         services.AddSingleton<IRequestLogger<TTraceId>, RequestLogger<TTraceId>>();
         services.AddSingleton<IResponseLogger<TTraceId>, ResponseLogger<TTraceId>>();
         
-        // Register IActivityDb<TTraceId> as scoped
-        services.AddScoped<IActivityDb<TTraceId>>(sp =>
+        services.AddSingleton<IActivityDb<TTraceId>>(sp =>
         {
             var options = sp.GetRequiredService<IOptions<ActivityOptions>>();
-            var logger = sp.GetRequiredService<ILogger<ActivityDb<TTraceId>>>();
-            var db = new ActivityDb<TTraceId>(options, logger);
-            var connection = dbConnectionFactory(sp);
-            db.SetConnection(connection);
-            return db;
+            var logger = sp.GetRequiredService<ILogger<IActivityDb<TTraceId>>>();
+            return new ActivityDb<TTraceId>(options, logger, () => dbConnectionFactory(sp));
         });
+        
+        // // Register IActivityDb<TTraceId> as scoped
+        // services.AddScoped<IActivityDb<TTraceId>>(sp =>
+        // {
+        //     var options = sp.GetRequiredService<IOptions<ActivityOptions>>();
+        //     var logger = sp.GetRequiredService<ILogger<IActivityDb<TTraceId>>>();
+        //     var db = new ActivityDb<TTraceId>(options, logger);
+        //     db.ConnectionFactory = () => dbConnectionFactory(sp);
+        //     return db;
+        // });
+        
 
         return services;
     }

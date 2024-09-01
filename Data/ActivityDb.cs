@@ -11,36 +11,47 @@ public interface IActivityDb<TTraceId>
 {
     Task StoreActivity(Activity<TTraceId> activity);
     Task UpdateActivity(Activity<TTraceId> activity);
-    void SetConnection(DbConnection connection);
 }
 
-public class ActivityDb<TTraceId>(
-    IOptions<ActivityOptions> options,
-    ILogger<ActivityDb<TTraceId>> logger) : IActivityDb<TTraceId>
+public class ActivityDb<TTraceId> : IActivityDb<TTraceId>
 {
-    private readonly string _uspStoreActivity = options.Value.UspStoreActivity;
-    private readonly string _uspUpdateActivity = options.Value.UspUpdateActivity;
-    private DbConnection? _connection;
+    private readonly string _uspStoreActivity;
+    private readonly string _uspUpdateActivity;
+    private readonly ILogger<IActivityDb<TTraceId>> _logger;
+    private readonly Func<DbConnection> _connectionFactory;
 
-    public void SetConnection(DbConnection connection)
+    public ActivityDb(
+        IOptions<ActivityOptions> options,
+        ILogger<IActivityDb<TTraceId>> logger,
+        Func<DbConnection> connectionFactory)
     {
-        _connection = connection;
+        _uspStoreActivity = options.Value.UspStoreActivity;
+        _uspUpdateActivity = options.Value.UspUpdateActivity;
+        _logger = logger;
+        _connectionFactory = connectionFactory;
     }
 
     public async Task StoreActivity(Activity<TTraceId>? activity)
     {
+        //TraceId = traceId,
+        // ClientIp = await GetClientIp(context),
+        // Path = await GetEndpoint(context),
+        // RequestAt = DateTime.UtcNow, // Consider using UTC time
+        // RequestBody = await GetRequestBody(context),
+        // Method = context.Request.Method,
+        // StatusCode = -1,
+        // IsCancelled = false
         await ExecuteNonQueryAsync(_uspStoreActivity, command =>
         {
             if (activity == null) return;
             AddTraceIdParameter(command, activity.TraceId);
             AddParameter(command, "@ClientIP", activity.ClientIp ?? string.Empty);
-            AddParameter(command, "@EndPoint", activity.Path ?? string.Empty);
+            AddParameter(command, "@EndPoint", activity.EndPoint ?? string.Empty);
             AddParameter(command, "@RequestAt", activity.RequestAt ?? DateTime.MinValue);
-            AddParameter(command, "@ResponseAt", activity.ResponseAt ?? DateTime.MinValue);
             AddParameter(command, "@RequestBody", activity.RequestBody ?? string.Empty);
-            AddParameter(command, "@ResponseBody", activity.ResponseBody ?? string.Empty);
             AddParameter(command, "@StatusCode", activity.StatusCode ?? -1);
-            AddParameter(command, "@RequestMethod", activity.Method ?? string.Empty);
+            AddParameter(command, "@RequestMethod", activity.RequestMethod ?? string.Empty);
+            AddParameter(command, "@IsCancelled", activity.IsCancelled ?? false);
         });
     }
 
@@ -52,24 +63,18 @@ public class ActivityDb<TTraceId>(
             AddParameter(command, "@ResponseBody", activity.ResponseBody ?? string.Empty);
             AddParameter(command, "@StatusCode", activity.StatusCode);
             AddParameter(command, "@ResponseAt", activity.ResponseAt ?? DateTime.MinValue);
+            AddParameter(command, "@IsCancelled", activity.IsCancelled ?? false);
         });
     }
 
     private async Task ExecuteNonQueryAsync(string storedProcedure, Action<DbCommand> setParameters)
     {
-        if (_connection == null)
-        {
-            throw new InvalidOperationException("Database connection has not been set.");
-        }
-
+        using var connection = _connectionFactory();
         try
         {
-            if (_connection.State != ConnectionState.Open)
-            {
-                await _connection.OpenAsync();
-            }
+            await connection.OpenAsync();
 
-            using var command = _connection.CreateCommand();
+            using var command = connection.CreateCommand();
             command.CommandText = storedProcedure;
             command.CommandType = CommandType.StoredProcedure;
             setParameters(command);
@@ -78,7 +83,7 @@ public class ActivityDb<TTraceId>(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "[ActivityLogger] Error executing stored procedure {StoredProcedure}", storedProcedure);
+            _logger.LogWarning(ex, "[ActivityLogger] Error executing stored procedure {StoredProcedure}", storedProcedure);
         }
     }
 
@@ -86,7 +91,6 @@ public class ActivityDb<TTraceId>(
     {
         if (traceId != null)
         {
-
             if (typeof(TTraceId) == typeof(Guid))
                 AddParameter(command, "@TraceID", (Guid)(object)traceId);
             else if (typeof(TTraceId) == typeof(long))
