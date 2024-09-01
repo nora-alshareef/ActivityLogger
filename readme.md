@@ -14,7 +14,6 @@ It captures request and response details and stores them in a database using con
    dotnet build 
    dotnet pack
 ```
-dotnet
 ### Add Reference to the Activity Logger DLL
 
 To add a reference to the Activity Logger DLL in your project, follow these steps:
@@ -43,9 +42,9 @@ In your project's `.csproj` file, add the RecyclableMemoryStream library:
 ```
 
 
-# Configuration
+## Configuration
 
-### 1. appsettings.json
+### appsettings.json
 
 Add the following configuration to your `appsettings.json`, it should be direct section:
 
@@ -65,7 +64,7 @@ ConnectionString: Your database connection string.
 UspStoreActivity: The name of the stored procedure for storing activity (default: "dbo.uspStoreActivity").
 UspUpdateActivity: The name of the stored procedure for updating activity (default: "dbo.uspUpdateActivity").
 
-### 2. Program.cs
+### Program.cs
 
 ```csharp
 using ActivityLogger.Middleware;
@@ -106,7 +105,7 @@ app.UseActivityMiddleware<Guid>(); //it should be last middleware , you can assi
 app.Run();
 ```
 
-### 3. Usage
+### Usage
 
 The middleware will automatically log all API requests and responses once it's set up as shown above.
 
@@ -149,6 +148,8 @@ CREATE TABLE [dbo].[Activity] (
     [IsCancelled] BIT NOT NULL DEFAULT 0
 )
 ```
+### Using the IsCancelled Flag
+The IsCancelled flag is used to indicate whether an operation was cancelled. This could be due to various reasons such as a timeout, a manual cancellation, or an OperationCanceledException being thrown.
 
 ### Stored Procedures
 Ensure you have the following stored procedures in your database:
@@ -214,11 +215,8 @@ SET ResponseBody = @ResponseBody,
     WHERE TraceId = @TraceId
 END
 ```
-### Using the IsCancelled Flag
-The IsCancelled flag is used to indicate whether an operation was cancelled. This could be due to various reasons such as a timeout, a manual cancellation, or an OperationCanceledException being thrown.
 
-
-# Read Activities directly : 
+### Read Activities directly : 
 
 versatile stored procedure that allows filtering by RequestAt, ResponseAt, StatusCode, and TraceId:
 ```sql
