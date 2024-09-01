@@ -3,6 +3,46 @@
 This library provides a middleware for logging API activity in ASP.NET Core applications.
 It captures request and response details and stores them in a database using configurable stored procedures.
 
+## Installation
+### Build and Use the Library
+
+1. Clone and build the repository
+2. git clone https://github.com/nora-alshareef/ActivityLogger.git
+3. Build and pack:
+```shell
+   cd ActivityLogger
+   dotnet build 
+   dotnet pack
+```
+dotnet
+### Add Reference to the Activity Logger DLL
+
+To add a reference to the Activity Logger DLL in your project, follow these steps:
+
+1. Right-click on your project in the Solution Explorer.
+2. Select "Add" > "Reference".
+3. In the Reference Manager dialog, click on "Browse".
+4. Navigate to the location of the Activity Logger DLL file.
+5. Select the DLL file (e.g., "ActivityLogger.dll") and click "Add".
+6. Click "OK" in the Reference Manager dialog to confirm.
+
+Alternatively, if you're using the command line or prefer editing the .csproj file directly, you can add the following line within an `<ItemGroup>` in your project file:
+
+```xml
+<Reference Include="ActivityLogger">
+    <HintPath>path\to\ActivityLogger.dll</HintPath>
+</Reference>
+```
+### Required Libraries
+In your project's `.csproj` file, add the RecyclableMemoryStream library:
+```xml
+<ItemGroup>
+        <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1" />
+...
+</ItemGroup>
+```
+
+
 # Configuration
 
 ### 1. appsettings.json
