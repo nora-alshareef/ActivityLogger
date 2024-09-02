@@ -15,9 +15,9 @@ public class ActivityMiddleware<TTraceId>(
 {
 
 
-    private async Task<TTraceId> SetTraceId(HttpContext context, Func<TTraceId>? traceIdGenerator)
+    private static async Task<TTraceId> SetTraceId(HttpContext context, Func<TTraceId> traceIdGeneratorFunc)
     {
-        var traceId = traceIdGenerator();
+        var traceId = traceIdGeneratorFunc();
         context.TraceIdentifier = traceId.ToString();
         return await Task.FromResult(traceId);
     }

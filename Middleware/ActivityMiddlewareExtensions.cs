@@ -32,17 +32,6 @@ public static class ActivityMiddlewareExtensions
             var logger = sp.GetRequiredService<ILogger<IActivityDb<TTraceId>>>();
             return new ActivityDb<TTraceId>(options, logger, () => dbConnectionFactory(sp));
         });
-        
-        // // Register IActivityDb<TTraceId> as scoped
-        // services.AddScoped<IActivityDb<TTraceId>>(sp =>
-        // {
-        //     var options = sp.GetRequiredService<IOptions<ActivityOptions>>();
-        //     var logger = sp.GetRequiredService<ILogger<IActivityDb<TTraceId>>>();
-        //     var db = new ActivityDb<TTraceId>(options, logger);
-        //     db.ConnectionFactory = () => dbConnectionFactory(sp);
-        //     return db;
-        // });
-        
 
         return services;
     }

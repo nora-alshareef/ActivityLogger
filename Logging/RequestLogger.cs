@@ -14,7 +14,7 @@ public interface IRequestLogger<TTraceId>
 
 public class RequestLogger<TTraceId> : IRequestLogger<TTraceId>
 {
-    private static readonly RecyclableMemoryStreamManager RecyclableMemoryStreamManager = new();
+    private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager = new();
 
     public async Task<Activity<TTraceId>> LogRequest(TTraceId traceId, HttpContext context, ILogger logger)
     {
@@ -64,10 +64,10 @@ public class RequestLogger<TTraceId> : IRequestLogger<TTraceId>
         return Task.FromResult(context.Request.Path + context.Request.QueryString);
     }
 
-    private static async Task<string> GetRequestBody(HttpContext context)
+    private async Task<string> GetRequestBody(HttpContext context)
     {
         context.Request.EnableBuffering();
-        await using var requestStream = RecyclableMemoryStreamManager.GetStream();
+        await using var requestStream = _recyclableMemoryStreamManager.GetStream();
         await context.Request.Body.CopyToAsync(requestStream);
         var reqBody = ReadStreamInChunks(requestStream);
         context.Request.Body.Position = 0;

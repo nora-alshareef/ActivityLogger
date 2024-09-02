@@ -13,38 +13,20 @@ public interface IActivityDb<TTraceId>
     Task UpdateActivity(Activity<TTraceId> activity);
 }
 
-public class ActivityDb<TTraceId> : IActivityDb<TTraceId>
+public class ActivityDb<TTraceId>(
+    IOptions<ActivityOptions> options,
+    ILogger<IActivityDb<TTraceId>> logger,
+    Func<DbConnection> connectionFactory)
+    : IActivityDb<TTraceId>
 {
-    private readonly string _uspStoreActivity;
-    private readonly string _uspUpdateActivity;
-    private readonly ILogger<IActivityDb<TTraceId>> _logger;
-    private readonly Func<DbConnection> _connectionFactory;
+    private readonly string _uspStoreActivity = options.Value.UspStoreActivity;
+    private readonly string _uspUpdateActivity = options.Value.UspUpdateActivity;
 
-    public ActivityDb(
-        IOptions<ActivityOptions> options,
-        ILogger<IActivityDb<TTraceId>> logger,
-        Func<DbConnection> connectionFactory)
+    public async Task StoreActivity(Activity<TTraceId> activity)
     {
-        _uspStoreActivity = options.Value.UspStoreActivity;
-        _uspUpdateActivity = options.Value.UspUpdateActivity;
-        _logger = logger;
-        _connectionFactory = connectionFactory;
-    }
-
-    public async Task StoreActivity(Activity<TTraceId>? activity)
-    {
-        //TraceId = traceId,
-        // ClientIp = await GetClientIp(context),
-        // Path = await GetEndpoint(context),
-        // RequestAt = DateTime.UtcNow, // Consider using UTC time
-        // RequestBody = await GetRequestBody(context),
-        // Method = context.Request.Method,
-        // StatusCode = -1,
-        // IsCancelled = false
         await ExecuteNonQueryAsync(_uspStoreActivity, command =>
         {
-            if (activity == null) return;
-            AddTraceIdParameter(command, activity.TraceId);
+            AddTraceIdParameter(command, activity.TraceId!);
             AddParameter(command, "@ClientIP", activity.ClientIp ?? string.Empty);
             AddParameter(command, "@EndPoint", activity.EndPoint ?? string.Empty);
             AddParameter(command, "@RequestAt", activity.RequestAt ?? DateTime.MinValue);
@@ -69,7 +51,7 @@ public class ActivityDb<TTraceId> : IActivityDb<TTraceId>
 
     private async Task ExecuteNonQueryAsync(string storedProcedure, Action<DbCommand> setParameters)
     {
-        using var connection = _connectionFactory();
+        using var connection = connectionFactory();
         try
         {
             await connection.OpenAsync();
@@ -83,7 +65,7 @@ public class ActivityDb<TTraceId> : IActivityDb<TTraceId>
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "[ActivityLogger] Error executing stored procedure {StoredProcedure}", storedProcedure);
+            logger.LogWarning(ex, "[ActivityLogger] Error executing stored procedure {StoredProcedure}", storedProcedure);
         }
     }
 
