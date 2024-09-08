@@ -59,7 +59,12 @@ public static class ActivityMiddlewareExtensions
 
 public class ActivityOptions
 {
-    [Required] public string ConnectionString { get; set; } = string.Empty;
-    public string UspStoreActivity { get; set; } = "dbo.uspStoreActivity";
-    public string UspUpdateActivity { get; set; } = "dbo.uspUpdateActivity";
+    public required string ConnectionString { get; set; } = string.Empty;
+    public required ActivityProcedures Procedures { get; set; }
+
+    public class ActivityProcedures
+    {
+        public required string UspStoreActivity { get; set; }
+        public required string UspUpdateActivity { get; set; }
+    }
 }

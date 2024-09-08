@@ -19,17 +19,17 @@ public class ActivityDb<TTraceId>(
     Func<DbConnection> connectionFactory)
     : IActivityDb<TTraceId>
 {
-    private readonly string _uspStoreActivity = options.Value.UspStoreActivity;
-    private readonly string _uspUpdateActivity = options.Value.UspUpdateActivity;
+    private readonly string _uspStoreActivity = options.Value.Procedures.UspStoreActivity;
+    private readonly string _uspUpdateActivity = options.Value.Procedures.UspUpdateActivity;
 
     public async Task StoreActivity(Activity<TTraceId> activity)
     {
         await ExecuteNonQueryAsync(_uspStoreActivity, command =>
         {
-            AddTraceIdParameter(command, activity.TraceId!);
+            AddTraceIdParameter(command, activity.TraceId);
             AddParameter(command, "@ClientIP", activity.ClientIp ?? string.Empty);
             AddParameter(command, "@EndPoint", activity.EndPoint ?? string.Empty);
-            AddParameter(command, "@RequestAt", activity.RequestAt ?? DateTime.MinValue);
+            AddParameter(command, "@RequestAt", activity.RequestAt );
             AddParameter(command, "@RequestBody", activity.RequestBody ?? string.Empty);
             AddParameter(command, "@StatusCode", activity.StatusCode ?? -1);
             AddParameter(command, "@RequestMethod", activity.RequestMethod ?? string.Empty);
