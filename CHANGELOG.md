@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased] [1.0.1] - 2024-09-16
+
+### Added
+- Command timeout configuration (not tested yet)
+- New configuration options:
+  - `CommandTimeout`: Default is 30 seconds
+  - `EnableRequestBodyLogging`: Default is true
+  - `EnableResponseBodyLogging`: Default is true
+
+### Changed
+- Updated README to include information about `Connect Timeout` in connection string
+- Modified activity configuration structure in `appsettings.json`:
+- 
+```json
+{
+  "ActivityConfigurations": {
+    "ConnectionString": "...",
+    "CommandTimeout": 10,
+    "EnableRequestBodyLogging": false,
+    "EnableResponseBodyLogging": true,
+    "Procedures": {
+      "UspStoreActivity": "usp_StoreActivity",
+      "UspUpdateActivity": "usp_UpdateActivity"
+    }
+  }
+}
+```
+### TODO
+- Finalize changes with Mohammed
+- Test command timeout functionality
+- Update documentation to reflect new configuration options
+
 ## [1.0.0] - 2024-09-02
 
 ### Added

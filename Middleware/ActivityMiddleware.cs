@@ -11,7 +11,9 @@ public class ActivityMiddleware<TTraceId>(
     IRequestLogger<TTraceId> requestLogger,
     IResponseLogger<TTraceId> responseLogger,
     ILogger<ActivityMiddleware<TTraceId>> logger,
-    Func<TTraceId> traceIdGenerator)
+    Func<TTraceId> traceIdGenerator,
+    bool shouldStoreRequestBody = true,
+    bool shouldStoreResponseBody=true)
 {
 
 
@@ -42,7 +44,6 @@ public class ActivityMiddleware<TTraceId>(
         catch (Exception ex)
         {
             logger.LogError(ex, "[ActivityLogger] Error in ActivityMiddleware,TraceId: {{TraceId}}");
-            throw;
         }
     }
 }

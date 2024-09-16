@@ -10,10 +10,9 @@ public interface IResponseLogger<TTraceId>
     Task LogResponse(HttpContext context, Activity<TTraceId> activity, ILogger logger, RequestDelegate next);
 }
 
-public class ResponseLogger<TTraceId> : IResponseLogger<TTraceId>
+public class ResponseLogger<TTraceId> (bool enableResponseBodyLogging): IResponseLogger<TTraceId>
 {
     private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager = new();
-    //private IResponseLogger<TTraceId>? _responseLoggerImplementation;
 
     public async Task LogResponse(HttpContext context, Activity<TTraceId> activity, ILogger logger,
         RequestDelegate next)
@@ -55,7 +54,15 @@ public class ResponseLogger<TTraceId> : IResponseLogger<TTraceId>
                         activity.TraceId);
                 }
 
-                await CaptureAndRestoreResponse(context, activity, logger, originalBodyStream, responseBody);
+                if (enableResponseBodyLogging)
+                {
+                    await CaptureAndRestoreResponse(context, activity, logger, originalBodyStream, responseBody);
+                }
+                else
+                {
+                    activity.ResponseBody = null;
+                }
+                
             }
         }
     }
@@ -117,10 +124,7 @@ public class ResponseLogger<TTraceId> : IResponseLogger<TTraceId>
         }
         finally
         {
-            activity.StatusCode = context.Response.StatusCode;
-            activity.ResponseAt = DateTime.Now;
             context.Response.Body = originalBodyStream;
-
             if (responseBody != originalBodyStream) await responseBody.DisposeAsync();
         }
     }

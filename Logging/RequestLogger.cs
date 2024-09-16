@@ -12,7 +12,7 @@ public interface IRequestLogger<TTraceId>
     Task<Activity<TTraceId>> LogRequest(TTraceId traceId, HttpContext context, ILogger logger);
 }
 
-public class RequestLogger<TTraceId> : IRequestLogger<TTraceId>
+public class RequestLogger<TTraceId>(bool enableRequestBodyLogging) : IRequestLogger<TTraceId>
 {
     private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager = new();
 
@@ -26,7 +26,7 @@ public class RequestLogger<TTraceId> : IRequestLogger<TTraceId>
                 ClientIp = await GetClientIp(context),
                 EndPoint = await GetEndpoint(context),
                 RequestAt = DateTime.UtcNow, // Consider using UTC time
-                RequestBody = await GetRequestBody(context),
+                RequestBody = enableRequestBodyLogging?await GetRequestBody(context):null,
                 RequestMethod = context.Request.Method,
                 StatusCode = -1,
                 IsCancelled = false

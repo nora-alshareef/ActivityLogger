@@ -15,7 +15,7 @@ public static class ActivityMiddlewareExtensions
     public static IServiceCollection AddActivityServices<TTraceId>(
         this IServiceCollection services,
         Func<IServiceProvider, DbConnection> dbConnectionFactory,
-        Action<ActivityOptions>? configureOptions = null)
+        Action<ActivityOptions> configureOptions )
     {
         
         if (configureOptions != null)
@@ -23,8 +23,18 @@ public static class ActivityMiddlewareExtensions
                 new ConfigureNamedOptions<ActivityOptions>(Options.DefaultName, configureOptions));
 
         services.AddScoped<Activity<TTraceId>>();
-        services.AddSingleton<IRequestLogger<TTraceId>, RequestLogger<TTraceId>>();
+        services.AddSingleton<IRequestLogger<TTraceId>>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<ActivityOptions>>().Value;
+            return new RequestLogger<TTraceId>(options.EnableRequestBodyLogging);
+        });
         services.AddSingleton<IResponseLogger<TTraceId>, ResponseLogger<TTraceId>>();
+        
+        services.AddSingleton<IResponseLogger<TTraceId>>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<ActivityOptions>>().Value;
+            return new ResponseLogger<TTraceId>(options.EnableResponseBodyLogging);
+        });
         
         services.AddSingleton<IActivityDb<TTraceId>>(sp =>
         {
@@ -60,7 +70,10 @@ public static class ActivityMiddlewareExtensions
 public class ActivityOptions
 {
     public required string ConnectionString { get; set; } = string.Empty;
+    public required int CommandTimeout { get; set; } = 2;// 30 seconds
     public required ActivityProcedures Procedures { get; set; }
+    public bool EnableRequestBodyLogging { get; set; }
+    public bool EnableResponseBodyLogging { get; set; }
 
     public class ActivityProcedures
     {

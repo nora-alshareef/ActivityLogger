@@ -51,18 +51,36 @@ Add the following configuration to your `appsettings.json`, it should be direct 
 ```json
 {
   "ActivityConfigurations": {
-    "ConnectionString": "Server=...;Initial Catalog=..;User Id=..;Password=....;trusted_connection=false;Persist Security Info=False;Encrypt=False;",
+    "ConnectionString": "...",
+    "CommandTimeout": 10,
+    "EnableRequestBodyLogging": false,
+    "EnableResponseBodyLogging": false,
     "Procedures": {
-      "StoreActivity": "dbo.uspStoreActivity",
-      "UpdateActivity": "dbo.uspUpdateActivity"
+      "UspStoreActivity": "usp_StoreActivity",
+      "UspUpdateActivity": "usp_UpdateActivity"
     }
   }
 }
 ```
 
-ConnectionString: Your database connection string.
-UspStoreActivity: The name of the stored procedure for storing activity (default: "dbo.uspStoreActivity").
-UspUpdateActivity: The name of the stored procedure for updating activity (default: "dbo.uspUpdateActivity").
+### Configuration Definitions:
+- ConnectionString: Your database connection string.
+    - Example: "Server=myserver;Database=mydb;User Id=myuser;Password=mypassword;"
+    - Note: Consider including Connect Timeout=X; in your connection string to set the connection timeout.
+
+- CommandTimeout: The time in seconds to wait for a database store/update command to execute. Default is 30 seconds.
+  - Example: 10 (for 10 seconds)
+  - EnableRequestBodyLogging: Determines whether to log request bodies. Default is true.
+  Set to false to disable request body logging.
+    - Recommendation: Disable if request bodies are consistently long and logging them provides little value.
+  - EnableResponseBodyLogging: Determines whether to log response bodies. Default is true.
+  Set to false to disable response body logging.
+    - Recommendation: Disable if response bodies are consistently long and logging them provides little value.
+- Procedures:
+   - UspStoreActivity: The name of the stored procedure for storing activity.
+       - Default: "dbo.uspStoreActivity"
+   - UspUpdateActivity: The name of the stored procedure for updating activity.
+       - Default: "dbo.uspUpdateActivity"
 
 ### Program.cs
 
@@ -83,12 +101,6 @@ builder.Services.AddActivityServices<Guid>(
     {
         var activityOptions = sp.GetRequiredService<IOptions<ActivityOptions>>().Value;
         return new SqlConnection(activityOptions.ConnectionString);
-    },
-    options => 
-    {
-        // Additional configuration if needed
-        options.UspStoreActivity = "uspStoreActivity";
-        options.UspUpdateActivity = "uspUpdateActivity";
     }
 );
 

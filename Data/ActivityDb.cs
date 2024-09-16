@@ -59,6 +59,8 @@ public class ActivityDb<TTraceId>(
             using var command = connection.CreateCommand();
             command.CommandText = storedProcedure;
             command.CommandType = CommandType.StoredProcedure;
+            command.CommandTimeout = options.Value.CommandTimeout; // Set the command timeout
+
             setParameters(command);
 
             await command.ExecuteNonQueryAsync();
